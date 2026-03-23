@@ -277,7 +277,7 @@
   const data = JSON.parse(localStorage.getItem('ilio_config') || 'null');
 
   if (!data) {
-    document.body.innerHTML = '<div style="padding:60px;font-family:sans-serif;color:#8a9099;">Geen configuratie gevonden. Ga terug naar de <a href="ilio_index.html">configurator</a>.</div>';
+    document.body.innerHTML = '<div style="padding:60px;font-family:sans-serif;color:#8a9099;">Geen configuratie gevonden. Ga terug naar de <a href="index.html">configurator</a>.</div>';
   } else {
     document.getElementById('docDate').textContent =
       new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
