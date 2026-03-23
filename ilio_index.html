@@ -742,7 +742,6 @@
   <button class="btn-primary" onclick="requestQuote()">Offerte aanvragen</button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   const BASE_PRICE = 2499;
   let extras = { filter: 200, control: 0, size: 0 };
@@ -828,152 +827,111 @@
   }
 
   function fmt(n) {
-    return n === 0 ? 'Inbegrepen' : '+ € ' + n.toLocaleString('nl-NL');
+    return n === 0 ? 'Inbegrepen' : '+ &euro; ' + n.toLocaleString('nl-NL');
   }
 
   function requestQuote() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-
     const total = BASE_PRICE + extras.filter + extras.control + extras.size;
     const date  = new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
 
-    // ── Kleuren
-    const INK    = [14, 14, 14];
-    const ACCENT = [58, 100, 117];
-    const SILVER = [138, 144, 153];
-    const RULE   = [212, 207, 200];
-    const WHITE  = [255, 255, 255];
-
-    // ── Achtergrond header balk
-    doc.setFillColor(...ACCENT);
-    doc.rect(0, 0, 210, 38, 'F');
-
-    // ── Logo
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(26);
-    doc.setTextColor(...WHITE);
-    doc.text('ILIO', 20, 22);
-
-    doc.setFontSize(8);
-    doc.setTextColor(255, 255, 255, 0.6);
-    doc.setTextColor(200, 215, 220);
-    doc.text('BY ABK INNOVENT', 20, 30);
-
-    // ── Datum rechtsboven
-    doc.setFontSize(8);
-    doc.setTextColor(200, 215, 220);
-    doc.text(date, 190, 22, { align: 'right' });
-    doc.text('Configuratiesamenvatting', 190, 30, { align: 'right' });
-
-    // ── Titel
-    doc.setTextColor(...INK);
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Uw ILIO configuratie', 20, 56);
-
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...SILVER);
-    doc.text('Onderstaand overzicht toont de door u geselecteerde opties en bijbehorende kosten.', 20, 64);
-
-    // ── Scheidingslijn
-    doc.setDrawColor(...RULE);
-    doc.setLineWidth(0.3);
-    doc.line(20, 70, 190, 70);
-
-    // ── Tabel header
-    let y = 80;
-    doc.setFillColor(244, 242, 238);
-    doc.rect(20, y - 6, 170, 10, 'F');
-
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...SILVER);
-    doc.text('MODULE', 24, y);
-    doc.text('KEUZE', 80, y);
-    doc.text('PRIJS', 180, y, { align: 'right' });
-
-    y += 4;
-    doc.setDrawColor(...RULE);
-    doc.line(20, y, 190, y);
-
-    // ── Tabel rijen
     const rows = [
-      { module: '01 — Afmeting',           ...selections.size },
-      { module: '02 — Filtersysteem',       ...selections.filter },
-      { module: '03 — Bediening',           ...selections.control },
-      { module: '04 — Verlichting',         ...selections.light },
-      { module: '05 — Afwerking',           ...selections.finish },
-      { module: 'Basisprijs',               label: 'ILIO afzuigkap', price: BASE_PRICE, base: true },
+      { module: 'Basisprijs',         label: 'ILIO afzuigkap',          price: '&euro; ' + BASE_PRICE.toLocaleString('nl-NL'), bold: true },
+      { module: '01 &mdash; Afmeting',        label: selections.size.label,    price: selections.size.price    === 0 ? 'Inbegrepen' : '+ &euro; ' + selections.size.price.toLocaleString('nl-NL') },
+      { module: '02 &mdash; Filtersysteem',   label: selections.filter.label,  price: selections.filter.price  === 0 ? 'Inbegrepen' : '+ &euro; ' + selections.filter.price.toLocaleString('nl-NL') },
+      { module: '03 &mdash; Bediening',       label: selections.control.label, price: selections.control.price === 0 ? 'Inbegrepen' : '+ &euro; ' + selections.control.price.toLocaleString('nl-NL') },
+      { module: '04 &mdash; Verlichting',     label: selections.light.label,   price: 'Inbegrepen' },
+      { module: '05 &mdash; Afwerking',       label: selections.finish.label,  price: 'Inbegrepen' },
     ];
 
-    // Basisprijs eerst tonen, dan opties
-    const ordered = [rows[5], rows[0], rows[1], rows[2], rows[3], rows[4]];
+    const rowsHtml = rows.map((r, i) => `
+      <tr style="background:${i % 2 === 0 ? '#faf9f6' : '#fff'}">
+        <td style="padding:11px 16px;font-size:12px;font-weight:${r.bold ? '600' : '400'};color:#0e0e0e;">${r.module}</td>
+        <td style="padding:11px 16px;font-size:12px;color:${r.bold ? '#0e0e0e' : '#8a9099'};">${r.label}</td>
+        <td style="padding:11px 16px;font-size:12px;text-align:right;font-weight:${r.bold ? '600' : '400'};color:#0e0e0e;">${r.price}</td>
+      </tr>`).join('');
 
-    ordered.forEach((row, i) => {
-      y += 12;
-      if (i % 2 === 1) {
-        doc.setFillColor(250, 249, 246);
-        doc.rect(20, y - 7, 170, 12, 'F');
+    const html = `<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8">
+    <title>ILIO Configuratie</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: Arial, sans-serif; background: #fff; color: #0e0e0e; }
+      @media print {
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .no-print { display: none; }
       }
+    </style>
+    </head><body>
 
-      doc.setFont('helvetica', row.base ? 'bold' : 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(...INK);
-      doc.text(row.module, 24, y);
+    <div style="max-width:680px;margin:0 auto;padding:0;">
 
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(row.base ? INK : SILVER);
-      doc.text(row.label, 80, y);
+      <!-- Header -->
+      <div style="background:#3a6475;padding:32px 40px;display:flex;justify-content:space-between;align-items:flex-end;">
+        <div>
+          <div style="font-size:30px;letter-spacing:0.18em;color:#fff;font-weight:300;">ILIO</div>
+          <div style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-top:4px;">by ABK Innovent</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.55);">Configuratiesamenvatting</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:4px;">${date}</div>
+        </div>
+      </div>
 
-      doc.setFont('helvetica', row.base ? 'bold' : 'normal');
-      doc.setTextColor(...INK);
-      const priceStr = row.base
-        ? '€ ' + row.price.toLocaleString('nl-NL')
-        : fmt(row.price);
-      doc.text(priceStr, 180, y, { align: 'right' });
-    });
+      <!-- Titel -->
+      <div style="padding:36px 40px 24px;">
+        <div style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#3a6475;margin-bottom:8px;">Uw selectie</div>
+        <h1 style="font-size:24px;font-weight:300;letter-spacing:0.04em;color:#0e0e0e;">Uw ILIO configuratie</h1>
+        <p style="font-size:12px;color:#8a9099;margin-top:8px;line-height:1.6;">Onderstaand overzicht toont uw geselecteerde opties en de bijbehorende kosten.</p>
+      </div>
 
-    // ── Totaallijn
-    y += 16;
-    doc.setFillColor(...ACCENT);
-    doc.rect(20, y - 7, 170, 14, 'F');
+      <!-- Tabel -->
+      <div style="padding:0 40px;">
+        <table style="width:100%;border-collapse:collapse;border:1px solid #d4cfc8;border-radius:4px;overflow:hidden;">
+          <thead>
+            <tr style="background:#f4f2ee;">
+              <th style="padding:10px 16px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#8a9099;text-align:left;font-weight:500;">Module</th>
+              <th style="padding:10px 16px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#8a9099;text-align:left;font-weight:500;">Keuze</th>
+              <th style="padding:10px 16px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#8a9099;text-align:right;font-weight:500;">Prijs</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
 
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(...WHITE);
-    doc.text('Totaal (excl. BTW)', 24, y + 1);
-    doc.text('€ ' + total.toLocaleString('nl-NL'), 180, y + 1, { align: 'right' });
+      <!-- Totaal -->
+      <div style="margin:0 40px;background:#3a6475;padding:18px 16px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#fff;">Totaal (excl. BTW)</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.55);margin-top:2px;">Inclusief installatieset &middot; Energieklasse A+</div>
+        </div>
+        <div style="font-size:22px;font-weight:300;color:#fff;letter-spacing:0.04em;">&euro; ${total.toLocaleString('nl-NL')}</div>
+      </div>
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
-    doc.setTextColor(200, 215, 220);
-    doc.text('Inclusief installatieset · Energieklasse A+', 24, y + 6);
+      <!-- Footer -->
+      <div style="padding:32px 40px 24px;border-top:1px solid #d4cfc8;margin-top:32px;">
+        <div style="font-size:13px;font-weight:600;color:#0e0e0e;margin-bottom:6px;">Tigo Deken BV</div>
+        <div style="font-size:11px;color:#8a9099;line-height:1.7;">
+          Deze configuratie is vrijblijvend samengesteld via de ILIO configurator.<br>
+          Neem contact op voor een definitieve offerte en levertijd.
+        </div>
+      </div>
 
-    // ── Footer
-    y += 28;
-    doc.setDrawColor(...RULE);
-    doc.line(20, y, 190, y);
+      <div style="padding:0 40px 32px;font-size:9px;color:#d4cfc8;letter-spacing:0.06em;">
+        Prijzen zijn indicatief en onder voorbehoud van wijzigingen. Tigo Deken BV &middot; ILIO by ABK Innovent
+      </div>
 
-    y += 10;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(...INK);
-    doc.text('Tigo Deken BV', 20, y);
+      <div class="no-print" style="padding:0 40px 40px;text-align:center;">
+        <button onclick="window.print()" style="background:#3a6475;color:#fff;border:none;padding:12px 28px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;border-radius:3px;">
+          Opslaan als PDF
+        </button>
+      </div>
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(...SILVER);
-    doc.text('Deze configuratie is vrijblijvend samengesteld via de ILIO configurator.', 20, y + 7);
-    doc.text('Neem contact op voor een definitieve offerte en levertijd.', 20, y + 13);
+    </div>
+    <script>window.onload = function(){ window.print(); }<\/script>
+    </body></html>`;
 
-    // ── Disclaimer onderaan pagina
-    doc.setFontSize(7);
-    doc.setTextColor(...RULE);
-    doc.text('Prijzen zijn indicatief en onder voorbehoud van wijzigingen. Tigo Deken BV · ILIO by ABK Innovent', 105, 285, { align: 'center' });
-
-    doc.save('ILIO-configuratie.pdf');
+    const blob = new Blob([html], { type: 'text/html' });
+    const url  = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   }
 
   // init
