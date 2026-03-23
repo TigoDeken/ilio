@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>ILIO — Configuratiesamenvatting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #fff;
+      color: #0e0e0e;
+      font-size: 14px;
+    }
+
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 0 60px;
+    }
+
+    /* Header */
+    .doc-header {
+      background: #3a6475;
+      padding: 36px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .doc-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 32px;
+      letter-spacing: 0.18em;
+      color: #fff;
+    }
+    .doc-logo-sub {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-top: 5px;
+    }
+    .doc-meta {
+      text-align: right;
+    }
+    .doc-meta-label {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+    }
+    .doc-meta-date {
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      margin-top: 4px;
+    }
+
+    /* Intro */
+    .doc-intro {
+      padding: 40px 48px 28px;
+    }
+    .doc-tag {
+      font-size: 9px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: #3a6475;
+      margin-bottom: 10px;
+    }
+    .doc-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 26px;
+      letter-spacing: 0.04em;
+      color: #0e0e0e;
+      margin-bottom: 8px;
+    }
+    .doc-sub {
+      font-size: 12px;
+      color: #8a9099;
+      line-height: 1.6;
+    }
+
+    /* Table */
+    .doc-table {
+      margin: 0 48px;
+      border: 1px solid #d4cfc8;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead tr {
+      background: #f4f2ee;
+    }
+    thead th {
+      padding: 11px 18px;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #8a9099;
+      font-weight: 500;
+      text-align: left;
+    }
+    thead th:last-child { text-align: right; }
+    tbody tr:nth-child(even) { background: #faf9f6; }
+    tbody tr:nth-child(odd)  { background: #fff; }
+    tbody td {
+      padding: 13px 18px;
+      font-size: 12px;
+      color: #0e0e0e;
+      border-top: 1px solid #f0ede8;
+    }
+    tbody td:nth-child(2) { color: #8a9099; }
+    tbody td:last-child   { text-align: right; }
+    tbody tr.base-row td  { font-weight: 500; }
+    tbody tr.base-row td:nth-child(2) { color: #0e0e0e; }
+
+    /* Totaal */
+    .doc-totaal {
+      margin: 0 48px;
+      background: #3a6475;
+      padding: 20px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .doc-totaal-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #fff;
+    }
+    .doc-totaal-sub {
+      font-size: 10px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 3px;
+      letter-spacing: 0.04em;
+    }
+    .doc-totaal-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 28px;
+      letter-spacing: 0.04em;
+      color: #fff;
+    }
+
+    /* Footer */
+    .doc-footer {
+      margin: 36px 48px 0;
+      padding-top: 28px;
+      border-top: 1px solid #d4cfc8;
+    }
+    .doc-footer-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: #0e0e0e;
+      margin-bottom: 6px;
+    }
+    .doc-footer-text {
+      font-size: 11px;
+      color: #8a9099;
+      line-height: 1.7;
+    }
+    .doc-disclaimer {
+      margin: 20px 48px 0;
+      font-size: 9px;
+      color: #c8c3bc;
+      letter-spacing: 0.06em;
+    }
+
+    /* Print knop */
+    .print-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #0e0e0e;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .print-bar span {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.06em;
+    }
+    .print-bar button {
+      background: #3a6475;
+      color: #fff;
+      border: none;
+      padding: 11px 24px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 500;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .print-bar button:hover { background: #2e5262; }
+
+    @media print {
+      .print-bar { display: none; }
+      body { padding-bottom: 0; }
+      .page { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="doc-header">
+    <div>
+      <div class="doc-logo">ILIO</div>
+      <div class="doc-logo-sub">by ABK Innovent</div>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-meta-label">Configuratiesamenvatting</div>
+      <div class="doc-meta-date" id="docDate"></div>
+    </div>
+  </div>
+
+  <div class="doc-intro">
+    <div class="doc-tag">Uw selectie</div>
+    <h1 class="doc-title">Uw ILIO configuratie</h1>
+    <p class="doc-sub">Onderstaand overzicht toont uw geselecteerde opties en bijbehorende kosten.</p>
+  </div>
+
+  <div class="doc-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Module</th>
+          <th>Keuze</th>
+          <th>Prijs</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="doc-totaal">
+    <div>
+      <div class="doc-totaal-label">Totaal (excl. BTW)</div>
+      <div class="doc-totaal-sub">Inclusief installatieset · Energieklasse A+</div>
+    </div>
+    <div class="doc-totaal-price" id="totaalPrice"></div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="doc-footer-name">Tigo Deken BV</div>
+    <div class="doc-footer-text">
+      Deze configuratie is vrijblijvend samengesteld via de ILIO configurator.<br>
+      Neem contact op voor een definitieve offerte en levertijd.
+    </div>
+  </div>
+
+  <div class="doc-disclaimer">
+    Prijzen zijn indicatief en onder voorbehoud van wijzigingen. Tigo Deken BV · ILIO by ABK Innovent
+  </div>
+
+</div>
+
+<div class="print-bar">
+  <span>Sla op als PDF via de printdialoog</span>
+  <button onclick="window.print()">Opslaan als PDF</button>
+</div>
+
+<script>
+  const data = JSON.parse(localStorage.getItem('ilio_config') || 'null');
+
+  if (!data) {
+    document.body.innerHTML = '<div style="padding:60px;font-family:sans-serif;color:#8a9099;">Geen configuratie gevonden. Ga terug naar de <a href="ilio_index.html">configurator</a>.</div>';
+  } else {
+    document.getElementById('docDate').textContent =
+      new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    document.getElementById('totaalPrice').textContent =
+      '€ ' + data.total.toLocaleString('nl-NL');
+
+    const fmt = n => n === 0 ? 'Inbegrepen' : '+ € ' + n.toLocaleString('nl-NL');
+
+    const rows = [
+      { module: 'Basisprijs',           label: 'ILIO afzuigkap',          price: '€ ' + data.base.toLocaleString('nl-NL'), base: true },
+      { module: '01 — Afmeting',        label: data.size.label,            price: fmt(data.size.price) },
+      { module: '02 — Filtersysteem',   label: data.filter.label,          price: fmt(data.filter.price) },
+      { module: '03 — Bediening',       label: data.control.label,         price: fmt(data.control.price) },
+      { module: '04 — Verlichting',     label: data.light.label,           price: 'Inbegrepen' },
+      { module: '05 — Afwerking',       label: data.finish.label,          price: 'Inbegrepen' },
+    ];
+
+    document.getElementById('tableBody').innerHTML = rows.map(r => `
+      <tr class="${r.base ? 'base-row' : ''}">
+        <td>${r.module}</td>
+        <td>${r.label}</td>
+        <td>${r.price}</td>
+      </tr>
+    `).join('');
+  }
+</script>
+
+</body>
+</html>

@@ -826,119 +826,18 @@
       '€ ' + total.toLocaleString('nl-NL');
   }
 
-  function fmt(n) {
-    return n === 0 ? 'Inbegrepen' : '+ &euro; ' + n.toLocaleString('nl-NL');
-  }
-
   function requestQuote() {
     const total = BASE_PRICE + extras.filter + extras.control + extras.size;
-    const date  = new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
-
-    const rows = [
-      { module: 'Basisprijs',         label: 'ILIO afzuigkap',          price: '&euro; ' + BASE_PRICE.toLocaleString('nl-NL'), bold: true },
-      { module: '01 &mdash; Afmeting',        label: selections.size.label,    price: selections.size.price    === 0 ? 'Inbegrepen' : '+ &euro; ' + selections.size.price.toLocaleString('nl-NL') },
-      { module: '02 &mdash; Filtersysteem',   label: selections.filter.label,  price: selections.filter.price  === 0 ? 'Inbegrepen' : '+ &euro; ' + selections.filter.price.toLocaleString('nl-NL') },
-      { module: '03 &mdash; Bediening',       label: selections.control.label, price: selections.control.price === 0 ? 'Inbegrepen' : '+ &euro; ' + selections.control.price.toLocaleString('nl-NL') },
-      { module: '04 &mdash; Verlichting',     label: selections.light.label,   price: 'Inbegrepen' },
-      { module: '05 &mdash; Afwerking',       label: selections.finish.label,  price: 'Inbegrepen' },
-    ];
-
-    const rowsHtml = rows.map((r, i) => `
-      <tr style="background:${i % 2 === 0 ? '#faf9f6' : '#fff'}">
-        <td style="padding:11px 16px;font-size:12px;font-weight:${r.bold ? '600' : '400'};color:#0e0e0e;">${r.module}</td>
-        <td style="padding:11px 16px;font-size:12px;color:${r.bold ? '#0e0e0e' : '#8a9099'};">${r.label}</td>
-        <td style="padding:11px 16px;font-size:12px;text-align:right;font-weight:${r.bold ? '600' : '400'};color:#0e0e0e;">${r.price}</td>
-      </tr>`).join('');
-
-    const html = `<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8">
-    <title>ILIO Configuratie</title>
-    <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { font-family: Arial, sans-serif; background: #fff; color: #0e0e0e; }
-      @media print {
-        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .no-print { display: none; }
-      }
-    </style>
-    </head><body>
-
-    <div style="max-width:680px;margin:0 auto;padding:0;">
-
-      <!-- Header -->
-      <div style="background:#3a6475;padding:32px 40px;display:flex;justify-content:space-between;align-items:flex-end;">
-        <div>
-          <div style="font-size:30px;letter-spacing:0.18em;color:#fff;font-weight:300;">ILIO</div>
-          <div style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-top:4px;">by ABK Innovent</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.55);">Configuratiesamenvatting</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:4px;">${date}</div>
-        </div>
-      </div>
-
-      <!-- Titel -->
-      <div style="padding:36px 40px 24px;">
-        <div style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#3a6475;margin-bottom:8px;">Uw selectie</div>
-        <h1 style="font-size:24px;font-weight:300;letter-spacing:0.04em;color:#0e0e0e;">Uw ILIO configuratie</h1>
-        <p style="font-size:12px;color:#8a9099;margin-top:8px;line-height:1.6;">Onderstaand overzicht toont uw geselecteerde opties en de bijbehorende kosten.</p>
-      </div>
-
-      <!-- Tabel -->
-      <div style="padding:0 40px;">
-        <table style="width:100%;border-collapse:collapse;border:1px solid #d4cfc8;border-radius:4px;overflow:hidden;">
-          <thead>
-            <tr style="background:#f4f2ee;">
-              <th style="padding:10px 16px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#8a9099;text-align:left;font-weight:500;">Module</th>
-              <th style="padding:10px 16px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#8a9099;text-align:left;font-weight:500;">Keuze</th>
-              <th style="padding:10px 16px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#8a9099;text-align:right;font-weight:500;">Prijs</th>
-            </tr>
-          </thead>
-          <tbody>${rowsHtml}</tbody>
-        </table>
-      </div>
-
-      <!-- Totaal -->
-      <div style="margin:0 40px;background:#3a6475;padding:18px 16px;display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <div style="font-size:13px;font-weight:600;color:#fff;">Totaal (excl. BTW)</div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.55);margin-top:2px;">Inclusief installatieset &middot; Energieklasse A+</div>
-        </div>
-        <div style="font-size:22px;font-weight:300;color:#fff;letter-spacing:0.04em;">&euro; ${total.toLocaleString('nl-NL')}</div>
-      </div>
-
-      <!-- Footer -->
-      <div style="padding:32px 40px 24px;border-top:1px solid #d4cfc8;margin-top:32px;">
-        <div style="font-size:13px;font-weight:600;color:#0e0e0e;margin-bottom:6px;">Tigo Deken BV</div>
-        <div style="font-size:11px;color:#8a9099;line-height:1.7;">
-          Deze configuratie is vrijblijvend samengesteld via de ILIO configurator.<br>
-          Neem contact op voor een definitieve offerte en levertijd.
-        </div>
-      </div>
-
-      <div style="padding:0 40px 32px;font-size:9px;color:#d4cfc8;letter-spacing:0.06em;">
-        Prijzen zijn indicatief en onder voorbehoud van wijzigingen. Tigo Deken BV &middot; ILIO by ABK Innovent
-      </div>
-
-      <div class="no-print" style="padding:0 40px 40px;text-align:center;">
-        <button onclick="window.print()" style="background:#3a6475;color:#fff;border:none;padding:12px 28px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;border-radius:3px;">
-          Opslaan als PDF
-        </button>
-      </div>
-
-    </div>
-    <script>window.onload = function(){ window.print(); }<\/script>
-    </body></html>`;
-
-    const blob = new Blob([html], { type: 'text/html' });
-    const url  = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.target = '_blank';
-    a.rel = 'noopener';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    localStorage.setItem('ilio_config', JSON.stringify({
+      base:    BASE_PRICE,
+      total:   total,
+      size:    selections.size,
+      filter:  selections.filter,
+      control: selections.control,
+      light:   selections.light,
+      finish:  selections.finish
+    }));
+    window.open('offerte.html', '_blank');
   }
 
   // init
