@@ -1,11 +1,841 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ILIO - Afzuigkap Configurator</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ILIO — Afzuigkap Configurator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #0e0e0e;
+      --steel:    #1c1f22;
+      --fog:      #f4f2ee;
+      --paper:    #faf9f6;
+      --silver:   #8a9099;
+      --rule:     #d4cfc8;
+      --accent:   #3a6475;
+      --accent2:  #b5862a;
+      --white:    #ffffff;
+      --r: 6px;
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ───────────────────────────────────────── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px;
+      height: 64px;
+      background: rgba(250,249,246,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .logo {
+      display: flex; align-items: baseline; gap: 12px;
+    }
+    .logo-mark {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 26px;
+      letter-spacing: 0.18em;
+      color: var(--ink);
+    }
+    .logo-sub {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--silver);
+      font-weight: 400;
+    }
+
+    nav {
+      display: flex; gap: 32px; align-items: center;
+    }
+    nav a {
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--silver); text-decoration: none; font-weight: 400;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--ink); }
+
+    .header-badge {
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); border: 1px solid var(--accent);
+      padding: 4px 10px; border-radius: 2px;
+    }
+
+    /* ── LAYOUT ───────────────────────────────────────── */
+    .app {
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      height: 100vh;
+      padding-top: 64px;
+    }
+
+    /* ── PREVIEW PANEL ────────────────────────────────── */
+    .preview {
+      position: sticky; top: 64px;
+      height: calc(100vh - 64px);
+      background: var(--steel);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Aboriginal-inspired dot pattern background */
+    .preview::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    .preview-inner {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 48px;
+    }
+
+    /* ── HOOD SVG VISUAL ─────────────────────────────── */
+    .hood-stage {
+      position: relative;
+      width: 420px;
+      height: 300px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .hood-wrap {
+      position: relative;
+      transition: all 0.5s var(--ease);
+    }
+
+    /* The hood - CSS perspective drawing */
+    .hood-body {
+      position: relative;
+      width: var(--hw, 280px);
+      height: 56px;
+      border-radius: 4px 4px 0 0;
+      transition: width 0.5s var(--ease), background 0.4s;
+    }
+
+    .hood-body.finish-brushed {
+      background: linear-gradient(180deg,
+        #4a5059 0%, #5c636e 20%, #3e4349 40%, #6b7280 60%, #4a5059 80%, #3a4048 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.15),
+        inset 0 -1px 0 rgba(0,0,0,0.3),
+        0 8px 40px rgba(0,0,0,0.5);
+    }
+    .hood-body.finish-polished {
+      background: linear-gradient(180deg,
+        #7a848f 0%, #9aa4ae 25%, #c8d0d6 45%, #8a949e 65%, #6a737c 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.4),
+        inset 0 -1px 0 rgba(0,0,0,0.2),
+        0 8px 40px rgba(0,0,0,0.5);
+    }
+    .hood-body.finish-mat {
+      background: linear-gradient(180deg,
+        #3a3f45 0%, #454b52 30%, #3d4248 60%, #353b41 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        inset 0 -1px 0 rgba(0,0,0,0.3),
+        0 8px 40px rgba(0,0,0,0.5);
+    }
+
+    /* Bottom intake slot */
+    .hood-bottom {
+      width: var(--hw, 280px);
+      height: 16px;
+      background: rgba(0,0,0,0.7);
+      border-radius: 0 0 2px 2px;
+      position: relative;
+      overflow: hidden;
+      transition: width 0.5s var(--ease);
+    }
+
+    /* LED strip */
+    .hood-led {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: transparent;
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+    .led-on .hood-led {
+      background: linear-gradient(90deg, #fff8e8, #fffdf5, #fff8e8);
+      box-shadow: 0 0 12px 3px rgba(255,252,230,0.6);
+    }
+    .led-spots .hood-led {
+      background: repeating-linear-gradient(90deg,
+        transparent 0, transparent 18px,
+        rgba(255,252,220,0.9) 18px, rgba(255,252,220,0.9) 22px,
+        transparent 22px, transparent 40px);
+      box-shadow: 0 0 8px 2px rgba(255,250,200,0.4);
+    }
+
+    /* Ventilation grille lines */
+    .hood-grille {
+      position: absolute; inset: 8px;
+      display: flex; gap: 3px; align-items: center;
+    }
+    .grille-line {
+      flex: 1; height: 1px;
+      background: rgba(0,0,0,0.4);
+    }
+
+    /* Ceiling bracket */
+    .hood-bracket {
+      width: 4px;
+      height: 60px;
+      background: linear-gradient(180deg, #555 0%, #444 100%);
+      margin: 0 auto;
+      border-radius: 2px;
+    }
+    .hood-ceiling {
+      width: var(--hw, 280px);
+      height: 8px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: width 0.5s var(--ease);
+    }
+
+    /* Perspective shadow */
+    .hood-shadow {
+      position: absolute;
+      bottom: -20px; left: 50%;
+      transform: translateX(-50%);
+      width: var(--hw, 280px);
+      height: 20px;
+      background: radial-gradient(ellipse at center,
+        rgba(0,0,0,0.5) 0%, transparent 70%);
+      transition: width 0.5s var(--ease);
+    }
+
+    /* ── SPECS TICKER ────────────────────────────────── */
+    .specs-ticker {
+      display: flex; gap: 32px;
+    }
+    .spec-item {
+      text-align: center;
+    }
+    .spec-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 22px;
+      color: var(--white);
+      letter-spacing: 0.04em;
+    }
+    .spec-label {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-top: 2px;
+    }
+
+    /* Finish label */
+    .finish-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-top: -32px;
+    }
+
+    /* ── CONFIGURATOR PANEL ───────────────────────────── */
+    .config-panel {
+      overflow-y: auto;
+      background: var(--paper);
+      padding: 48px 40px 120px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--rule) transparent;
+    }
+
+    .config-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 32px;
+      letter-spacing: 0.06em;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .config-subtitle {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--silver);
+      margin-bottom: 40px;
+    }
+
+    /* ── STEP ─────────────────────────────────────────── */
+    .step {
+      margin-bottom: 36px;
+      padding-bottom: 36px;
+      border-bottom: 1px solid var(--rule);
+      animation: fadeUp 0.4s var(--ease) both;
+    }
+    .step:last-of-type { border-bottom: none; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-header {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .step-num {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .step-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 18px;
+      letter-spacing: 0.06em;
+      color: var(--ink);
+      margin-top: 2px;
+    }
+    .step-price {
+      font-size: 11px;
+      color: var(--silver);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── OPTION CARDS ─────────────────────────────────── */
+    .options {
+      display: grid;
+      gap: 8px;
+    }
+    .options.cols-2 { grid-template-columns: 1fr 1fr; }
+    .options.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+    .option-card {
+      position: relative;
+      background: var(--white);
+      border: 1.5px solid var(--rule);
+      border-radius: var(--r);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      overflow: hidden;
+    }
+    .option-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--accent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .option-card:hover { border-color: var(--silver); transform: translateY(-1px); }
+    .option-card.selected {
+      border-color: var(--accent);
+      background: rgba(58,100,117,0.04);
+    }
+    .option-card.selected::after {
+      content: '✓';
+      position: absolute; top: 10px; right: 12px;
+      font-size: 11px; color: var(--accent);
+      font-weight: 500;
+    }
+
+    .option-name {
+      font-weight: 500;
+      font-size: 13px;
+      color: var(--ink);
+      position: relative; z-index: 1;
+    }
+    .option-desc {
+      font-size: 11px;
+      color: var(--silver);
+      margin-top: 3px;
+      position: relative; z-index: 1;
+      line-height: 1.4;
+    }
+    .option-badge {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: var(--accent);
+      color: var(--white);
+      padding: 2px 7px;
+      border-radius: 2px;
+      margin-top: 6px;
+    }
+    .option-price-add {
+      font-size: 11px;
+      color: var(--accent2);
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    /* Size visual indicator */
+    .size-bar {
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+      margin-top: 8px;
+      opacity: 0.3;
+      transition: opacity 0.2s;
+    }
+    .option-card.selected .size-bar { opacity: 1; }
+
+    /* Finish swatch */
+    .finish-swatch {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      margin-bottom: 8px;
+      border: 2px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .option-card.selected .finish-swatch { border-color: var(--accent); }
+    .swatch-brushed {
+      background: repeating-linear-gradient(
+        -45deg, #707880 0px, #707880 2px, #5c636e 2px, #5c636e 4px
+      );
+    }
+    .swatch-polished {
+      background: radial-gradient(circle at 35% 35%, #d0d8df, #8a949e);
+    }
+    .swatch-mat {
+      background: #3d4248;
+    }
+
+    /* ── CUSTOM SIZE INPUT ─────────────────────────────── */
+    .custom-size-fields {
+      display: none; gap: 12px; margin-top: 12px;
+    }
+    .custom-size-fields.visible { display: flex; }
+    .size-input-wrap {
+      flex: 1;
+    }
+    .size-input-wrap label {
+      display: block; font-size: 10px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--silver); margin-bottom: 6px;
+    }
+    .size-input-wrap input {
+      width: 100%; padding: 10px 14px;
+      background: var(--white); border: 1.5px solid var(--rule);
+      border-radius: var(--r); font-family: 'DM Sans', sans-serif;
+      font-size: 13px; color: var(--ink);
+      outline: none; transition: border-color 0.2s;
+    }
+    .size-input-wrap input:focus { border-color: var(--accent); }
+
+    /* ── PRICE FOOTER ─────────────────────────────────── */
+    .price-footer {
+      position: fixed;
+      bottom: 0; right: 0;
+      width: 480px;
+      background: var(--ink);
+      padding: 20px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 50;
+    }
+
+    .price-breakdown {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .price-label {
+      font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+    .price-total {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-size: 30px;
+      color: var(--white); letter-spacing: 0.04em;
+      transition: all 0.3s var(--ease);
+    }
+    .price-note {
+      font-size: 9px; color: rgba(255,255,255,0.3);
+      letter-spacing: 0.1em;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--white);
+      border: none; cursor: pointer;
+      padding: 14px 28px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      border-radius: 3px; font-weight: 500;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: #2e5262; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    /* ── ENERGY BADGE ─────────────────────────────────── */
+    .energy-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #2a5e3a; color: #fff;
+      padding: 4px 12px; border-radius: 2px;
+      font-size: 11px; letter-spacing: 0.1em;
+      font-weight: 500; margin-top: 12px;
+    }
+
+    /* scrollbar */
+    .config-panel::-webkit-scrollbar { width: 3px; }
+    .config-panel::-webkit-scrollbar-track { background: transparent; }
+    .config-panel::-webkit-scrollbar-thumb { background: var(--rule); }
+
+    /* ── RESPONSIVE ───────────────────────────────────── */
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 1fr; }
+      .preview { height: 320px; position: relative; top: 0; }
+      .price-footer { width: 100%; }
+      nav { display: none; }
+    }
+  </style>
 </head>
 <body>
-    <h1>ILIO Afzuigkap Configurator</h1>
+
+<header>
+  <div class="logo">
+    <span class="logo-mark">ILIO</span>
+    <span class="logo-sub">by ABK Innovent</span>
+  </div>
+  <nav>
+    <a href="#">Assortiment</a>
+    <a href="#">Techniek</a>
+    <a href="#">Dealers</a>
+    <a href="#">Contact</a>
+  </nav>
+  <span class="header-badge">Configurator</span>
+</header>
+
+<div class="app">
+
+  <!-- ── PREVIEW ── -->
+  <div class="preview">
+    <div class="preview-inner">
+
+      <div class="hood-stage">
+        <div class="hood-wrap" id="hoodWrap">
+          <div class="hood-ceiling" id="hoodCeiling"></div>
+          <div class="hood-bracket"></div>
+          <div class="hood-body finish-brushed" id="hoodBody">
+            <div class="hood-grille">
+              <div class="grille-line"></div><div class="grille-line"></div>
+              <div class="grille-line"></div><div class="grille-line"></div>
+              <div class="grille-line"></div>
+            </div>
+          </div>
+          <div class="hood-bottom" id="hoodBottom">
+            <div class="hood-led" id="hoodLed"></div>
+          </div>
+          <div class="hood-shadow" id="hoodShadow"></div>
+        </div>
+      </div>
+
+      <div class="finish-label" id="finishLabel">RVS 304 — Geborsteld</div>
+
+      <div class="specs-ticker">
+        <div class="spec-item">
+          <div class="spec-val" id="specSize">80×80</div>
+          <div class="spec-label">cm</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-val">815</div>
+          <div class="spec-label">m³/u</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-val">&lt;40</div>
+          <div class="spec-label">dB</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-val">180</div>
+          <div class="spec-label">mm hoogte</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── CONFIGURATOR ── -->
+  <div class="config-panel">
+
+    <p class="config-subtitle">Stap voor stap samenstellen</p>
+    <h1 class="config-title">Stel uw ILIO<br>afzuigkap samen</h1>
+
+    <div class="energy-badge">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L2 8h5l-1 5 6-8H7l1-4z" fill="white"/></svg>
+      Energieklasse A+
+    </div>
+
+    <!-- STEP 1: AFMETING -->
+    <div class="step" style="animation-delay:0.05s; margin-top: 32px;">
+      <div class="step-header">
+        <div>
+          <div class="step-num">01 — Afmeting</div>
+          <div class="step-title">Kies uw formaat</div>
+        </div>
+      </div>
+      <div class="options cols-2">
+        <div class="option-card" data-step="size" data-val="60x60" data-w="180" onclick="select(this)">
+          <div class="option-name">60 × 60 cm</div>
+          <div class="option-desc">Compact — 1-2 persoons keuken</div>
+          <div class="size-bar" style="width:50%"></div>
+        </div>
+        <div class="option-card selected" data-step="size" data-val="80x80" data-w="240" onclick="select(this)">
+          <div class="option-name">80 × 80 cm</div>
+          <div class="option-desc">Standaard — meest gekozen</div>
+          <div class="size-bar" style="width:65%"></div>
+        </div>
+        <div class="option-card" data-step="size" data-val="100x80" data-w="290" onclick="select(this)">
+          <div class="option-name">100 × 80 cm</div>
+          <div class="option-desc">Ruim — gezins- of open keuken</div>
+          <div class="size-bar" style="width:80%"></div>
+        </div>
+        <div class="option-card" data-step="size" data-val="120x80" data-w="340" onclick="select(this)">
+          <div class="option-name">120 × 80 cm</div>
+          <div class="option-desc">Groot — kookeiland of professioneel</div>
+          <div class="size-bar" style="width:100%"></div>
+        </div>
+        <div class="option-card" data-step="size" data-val="maatwerk" data-w="280" data-extra="500" onclick="select(this)" style="grid-column: 1/-1;">
+          <div class="option-name">Maatwerk</div>
+          <div class="option-desc">Exacte afmetingen op uw keuken afgestemd via Dumaco</div>
+          <div class="option-price-add">+ €500</div>
+        </div>
+      </div>
+      <div class="custom-size-fields" id="customSizeFields">
+        <div class="size-input-wrap">
+          <label>Breedte (cm)</label>
+          <input type="number" placeholder="bv. 110" min="40" max="200">
+        </div>
+        <div class="size-input-wrap">
+          <label>Diepte (cm)</label>
+          <input type="number" placeholder="bv. 90" min="40" max="120">
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: FILTER -->
+    <div class="step" style="animation-delay:0.1s;">
+      <div class="step-header">
+        <div>
+          <div class="step-num">02 — Filtersysteem</div>
+          <div class="step-title">Luchtzuivering</div>
+        </div>
+      </div>
+      <div class="options">
+        <div class="option-card selected" data-step="filter" data-val="plasma" data-extra="200" onclick="select(this)">
+          <div class="option-name">Plasmafilter</div>
+          <div class="option-desc">98% geur- en fijnstofverwijdering. Onderhoudsvrij gedurende 10 jaar. Geen afvoer naar buiten vereist.</div>
+          <div class="option-badge">Aanbevolen</div>
+          <div class="option-price-add">+ €200</div>
+        </div>
+        <div class="option-card" data-step="filter" data-val="koolstof" onclick="select(this)">
+          <div class="option-name">Koolstoffilter</div>
+          <div class="option-desc">Standaard recirculatie. Reinigbaar in vaatwasser. Vervanging aanbevolen elke 2 maanden.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: BEDIENING -->
+    <div class="step" style="animation-delay:0.15s;">
+      <div class="step-header">
+        <div>
+          <div class="step-num">03 — Bediening</div>
+          <div class="step-title">Interface</div>
+        </div>
+      </div>
+      <div class="options cols-2">
+        <div class="option-card selected" data-step="control" data-val="touch" onclick="select(this)">
+          <div class="option-name">Touch-paneel</div>
+          <div class="option-desc">Geïntegreerd in de kap</div>
+        </div>
+        <div class="option-card" data-step="control" data-val="rf" onclick="select(this)">
+          <div class="option-name">RF Afstandsbediening</div>
+          <div class="option-desc">Metalen afwerking</div>
+        </div>
+        <div class="option-card" data-step="control" data-val="wifi" data-extra="75" onclick="select(this)">
+          <div class="option-name">Wi-Fi / App</div>
+          <div class="option-desc">Bediening via smartphone</div>
+          <div class="option-price-add">+ €75</div>
+        </div>
+        <div class="option-card" data-step="control" data-val="touch-wifi" data-extra="75" onclick="select(this)">
+          <div class="option-name">Touch + Wi-Fi</div>
+          <div class="option-desc">Volledig — paneel én app</div>
+          <div class="option-price-add">+ €75</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: VERLICHTING -->
+    <div class="step" style="animation-delay:0.2s;">
+      <div class="step-header">
+        <div>
+          <div class="step-num">04 — Verlichting</div>
+          <div class="step-title">LED-systeem</div>
+        </div>
+      </div>
+      <div class="options cols-2">
+        <div class="option-card selected" data-step="light" data-val="strip" onclick="select(this)">
+          <div class="option-name">LED-strip</div>
+          <div class="option-desc">Doorlopend, egaal licht</div>
+        </div>
+        <div class="option-card" data-step="light" data-val="spots" onclick="select(this)">
+          <div class="option-name">LED-spots</div>
+          <div class="option-desc">Klassiek, gericht licht</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5: AFWERKING -->
+    <div class="step" style="animation-delay:0.25s;">
+      <div class="step-header">
+        <div>
+          <div class="step-num">05 — Afwerking</div>
+          <div class="step-title">RVS 304 oppervlak</div>
+        </div>
+      </div>
+      <div class="options cols-3">
+        <div class="option-card selected" data-step="finish" data-val="brushed" onclick="select(this)">
+          <div class="finish-swatch swatch-brushed"></div>
+          <div class="option-name">Geborsteld</div>
+          <div class="option-desc">Klassiek, fingerprint-resistent</div>
+        </div>
+        <div class="option-card" data-step="finish" data-val="polished" onclick="select(this)">
+          <div class="finish-swatch swatch-polished"></div>
+          <div class="option-name">Gepolijst</div>
+          <div class="option-desc">Spiegelend, hoogglans</div>
+        </div>
+        <div class="option-card" data-step="finish" data-val="mat" onclick="select(this)">
+          <div class="finish-swatch swatch-mat"></div>
+          <div class="option-name">Mat</div>
+          <div class="option-desc">Industrieel, donker</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end config-panel -->
+
+</div><!-- end app -->
+
+<!-- PRICE FOOTER -->
+<div class="price-footer">
+  <div class="price-breakdown">
+    <div class="price-label">Configuratie totaal</div>
+    <div class="price-total" id="priceTotal">€ 2.699</div>
+    <div class="price-note">excl. BTW · incl. installatieset</div>
+  </div>
+  <button class="btn-primary" onclick="requestQuote()">Offerte aanvragen</button>
+</div>
+
+<script>
+  const BASE_PRICE = 2499;
+  let extras = { filter: 200, control: 0, size: 0 };
+
+  const sizeWidths = {
+    '60x60': 180, '80x80': 240, '100x80': 290, '120x80': 340, 'maatwerk': 260
+  };
+
+  const finishMap = {
+    brushed: { cls: 'finish-brushed', label: 'RVS 304 — Geborsteld' },
+    polished: { cls: 'finish-polished', label: 'RVS 304 — Gepolijst' },
+    mat:     { cls: 'finish-mat',     label: 'RVS 304 — Mat' }
+  };
+
+  function select(el) {
+    const step = el.dataset.step;
+    const val  = el.dataset.val;
+    const w    = parseInt(el.dataset.w || 240);
+    const xtra = parseInt(el.dataset.extra || 0);
+
+    // deselect siblings
+    document.querySelectorAll(`[data-step="${step}"]`).forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+
+    // custom size fields
+    if (step === 'size') {
+      const fields = document.getElementById('customSizeFields');
+      fields.classList.toggle('visible', val === 'maatwerk');
+      extras.size = xtra;
+      updateHoodSize(val);
+    }
+
+    if (step === 'filter') extras.filter = xtra;
+    if (step === 'control') extras.control = xtra;
+
+    if (step === 'finish') updateFinish(val);
+    if (step === 'light')  updateLight(val);
+
+    updatePrice();
+  }
+
+  function updateHoodSize(val) {
+    const w = sizeWidths[val] || 240;
+    const px = w + 'px';
+    const els = ['hoodBody','hoodBottom','hoodCeiling','hoodShadow'];
+    els.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.setProperty('--hw', px) || (el.style.width = px);
+    });
+    // update width via CSS var on parent
+    document.getElementById('hoodBody').style.width = px;
+    document.getElementById('hoodBottom').style.width = px;
+    document.getElementById('hoodCeiling').style.width = px;
+    document.getElementById('hoodShadow').style.width = px;
+
+    const label = val === 'maatwerk' ? 'Op maat' : val.replace('x','×');
+    document.getElementById('specSize').textContent = label;
+  }
+
+  function updateFinish(val) {
+    const body = document.getElementById('hoodBody');
+    body.className = 'hood-body'; // reset
+    body.classList.add('finish-' + val);
+    document.getElementById('finishLabel').textContent = finishMap[val]?.label || '';
+  }
+
+  function updateLight(val) {
+    const led = document.getElementById('hoodLed');
+    const bottom = document.getElementById('hoodBottom');
+    led.className = 'hood-led';
+    bottom.className = 'hood-bottom';
+    if (val === 'strip') {
+      bottom.classList.add('led-on');
+    } else if (val === 'spots') {
+      bottom.classList.add('led-spots');
+    }
+  }
+
+  function updatePrice() {
+    const total = BASE_PRICE + extras.filter + extras.control + extras.size;
+    document.getElementById('priceTotal').textContent =
+      '€ ' + total.toLocaleString('nl-NL');
+  }
+
+  function requestQuote() {
+    alert('Bedankt voor uw configuratie.\nWij nemen binnen 2 werkdagen contact met u op.');
+  }
+
+  // init
+  updateLight('strip');
+  updatePrice();
+</script>
+
 </body>
 </html>
