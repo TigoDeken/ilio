@@ -423,27 +423,6 @@
       background: #3d4248;
     }
 
-    /* ── CUSTOM SIZE INPUT ─────────────────────────────── */
-    .custom-size-fields {
-      display: none; gap: 12px; margin-top: 12px;
-    }
-    .custom-size-fields.visible { display: flex; }
-    .size-input-wrap {
-      flex: 1;
-    }
-    .size-input-wrap label {
-      display: block; font-size: 10px; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--silver); margin-bottom: 6px;
-    }
-    .size-input-wrap input {
-      width: 100%; padding: 10px 14px;
-      background: var(--white); border: 1.5px solid var(--rule);
-      border-radius: var(--r); font-family: 'DM Sans', sans-serif;
-      font-size: 13px; color: var(--ink);
-      outline: none; transition: border-color 0.2s;
-    }
-    .size-input-wrap input:focus { border-color: var(--accent); }
-
     /* ── PRICE FOOTER ─────────────────────────────────── */
     .price-footer {
       position: fixed;
@@ -611,21 +590,6 @@
           <div class="option-desc">Groot — kookeiland of professioneel</div>
           <div class="size-bar" style="width:100%"></div>
         </div>
-        <div class="option-card" data-step="size" data-val="maatwerk" data-w="280" data-extra="500" onclick="select(this)" style="grid-column: 1/-1;">
-          <div class="option-name">Maatwerk</div>
-          <div class="option-desc">Exacte afmetingen op uw keuken afgestemd via Dumaco</div>
-          <div class="option-price-add">+ €500</div>
-        </div>
-      </div>
-      <div class="custom-size-fields" id="customSizeFields">
-        <div class="size-input-wrap">
-          <label>Breedte (cm)</label>
-          <input type="number" placeholder="bv. 110" min="40" max="200">
-        </div>
-        <div class="size-input-wrap">
-          <label>Diepte (cm)</label>
-          <input type="number" placeholder="bv. 90" min="40" max="120">
-        </div>
       </div>
     </div>
 
@@ -756,7 +720,7 @@
   };
 
   const sizeWidths = {
-    '60x60': 180, '80x80': 240, '100x80': 290, '120x80': 340, 'maatwerk': 260
+    '60x60': 180, '80x80': 240, '100x80': 290, '120x80': 340
   };
 
   const finishMap = {
@@ -779,8 +743,6 @@
     selections[step] = { label: name, price: xtra };
 
     if (step === 'size') {
-      const fields = document.getElementById('customSizeFields');
-      fields.classList.toggle('visible', val === 'maatwerk');
       extras.size = xtra;
       updateHoodSize(val);
     }
@@ -801,7 +763,7 @@
     document.getElementById('hoodBottom').style.width = px;
     document.getElementById('hoodCeiling').style.width = px;
     document.getElementById('hoodShadow').style.width = px;
-    const label = val === 'maatwerk' ? 'Op maat' : val.replace('x','×');
+    const label = val.replace('x','×');
     document.getElementById('specSize').textContent = label;
   }
 
